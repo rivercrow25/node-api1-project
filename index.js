@@ -1,4 +1,5 @@
 const express = require('express')
+const cors = require('cors')
 
 let users = []
 
@@ -6,6 +7,7 @@ const port = 5000
 
 const server = express()
 server.use(express.json())
+server.use(cors())
 
 server.post('/api/users', (req, res) => {
     const newUser = req.body;
@@ -33,8 +35,9 @@ server.get('/api/users', (req, res) => {
 
 server.get('/api/users/:id', (req, res) => {
     const { id } = req.params
-    if (users.find(i => i.id === Number(id))) {
-        res.status(200).json(users)
+    const user = users.find(u => u.id === Number(id))
+    if (user) {
+        res.status(200).json(user)
     } else {
         res.status(404).json({ message: "the user with the specified id does not exist" })
     }
@@ -56,9 +59,9 @@ server.delete('/api/users/:id', (req, res) => {
 
 server.put('/api/users/:id', (req, res) => {
     const updateUser = req.body
-    const { userId } = req.params
-    const oldUser = users.find(i => i.id === Number(userId))
-    if (users.find(i => i.id == (userId))) {
+    const { id } = req.params
+    const oldUser = users.find(i => i.id === Number(id))
+    if (oldUser) {
         if (req.body.name.length > 0 || req.body.bio.length > 0) {
             if (oldUser === updateUser) {
                 res.status(500).json({ errorMessage: "the user information could not be modified" })
